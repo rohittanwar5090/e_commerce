@@ -1,129 +1,57 @@
-// // import "./styles.css";
-// import { useState } from "react";
-
-// export default function App() {
-//   const [count, setCount] = useState(0);
-//   const [quantity, setQuantity] = useState(0);
-
-//   const handleSubtractOne = () => {
-//     setCount(count - 1);
-//   };                                    //for - 1
-
-//   const handleAddOne = () => {
-//     setCount(count + 1);
-//   };                            //for + 1
-
-//   const handleOnChange = (e) => {
-//     setQuantity(e.target.value);  // for taking the input value
-//   };
-
-//   const handleSubtractQuantity = () => {
-//     console.log(count)
-//      setCount(count - parseInt(quantity, 10));
-//      console.log(count)
-//   };
-
-//   const handleAddQuantity = () => {
-//     console.log(count)
-//      setCount(count + parseInt(quantity, 10));
-//      console.log(count)
-//   };
-
-//   const handleResetCounter = () => {
-//     setCount(0);
-//     setQuantity(0);
-//   };
-
-//   return (
-//     <div>
-//       <h1>Simple Counter in React using Hooks</h1>
-//       <div>
-//         <div>
-//           <p>{count}</p>
-//           <div >
-//             <button  onClick={handleSubtractOne}>
-//               -1
-//             </button>
-//             <button onClick={handleAddOne}>+1</button>
-//           </div>
-//         </div>
-//         <div>
-//           <h3>Add / substract custom quantity</h3>
-//           <div>
-//             <input
-//               type="text"
-//               value={quantity}
-//               onChange={handleOnChange}
-//               className={"mr-10"}
-//             />
-
-//             <button
-//               className={"mr-5 width-40"}
-//               onClick={handleSubtractQuantity}
-//             >
-//               -
-//             </button>
-//             <button className={"width-40"} onClick={handleAddQuantity}>
-//               +
-//             </button>
-//           </div>
-//         </div>
-//         <button id={"counter-reset"} onClick={handleResetCounter}>
-//           Reset Counter
-//         </button>
-//       </div>
-//     </div>
-//   );
-// }
-
-import { useState } from 'react';
+import React from 'react';
+import { Routes, Route , Navigate, useLocation, useParams } from 'react-router-dom';
 import './App.css';
+import HomePage from './pages/homepage/Homepage';
+import Shop from './pages/shop/Shop';
+import SigninAndSignUp from './pages/SigninAndSignUp/SigninAndSignUp'
+import Header from './components/header/Header';
+import Checkout from './pages/checkout/Checkout';
+import { auth , createUserProfileDocument} from './firebase/firebase-utilis'
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {currentUserAction} from '../src/redux/user/userAction'
+import CollectionOverview from './components/collectionoverview/CollectionOverview';
+// import   { selectCurrentUser} from  '../../redux/cart/userSelector'
 
 function App() {
-  const [first, setFirst] = useState(0);
-  const [inputchange, setInputchange] = useState();
+  const dispatch = useDispatch()
+  const currentUser = useSelector((state)=> state.user.currentUser)
+  
+  useEffect(() => {
+    let unsubscribeFromAuth = null;
+    unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth =>{
+      if(userAuth){                        
+        const useRef = await createUserProfileDocument(userAuth)                       
+        useRef.onSnapshot(snapShot =>{        
+          dispatch(currentUserAction({
+            id: snapShot.id , 
+            ...snapShot.data()
+          }))                                      
+        })      
+      }
+      else{
+        dispatch(currentUserAction(userAuth))
+        // setCurrentUser(userAuth)
+      }     
+    })              
+    console.log('did mount');    
+      
 
-  const changesetting = (e) => {
-    setInputchange(e.target.value);
-  }
-  const incrementer = () => {
-    if (parseInt(inputchange, 10) > 1)
-      setFirst(first => first + parseInt(inputchange, 10))
-    else {
-      setFirst(first + 1);
-    }
-  }
-  const decrementer = () => {
-    if (parseInt(inputchange, 10) > 1)
-      setFirst(first => first - parseInt(inputchange, 10))
-    else {
-      setFirst(first - 1);
-    }
-  }
-  const reset = () => {
-    setFirst(0);
-    setInputchange("Add a number ")
-  }
+    return () =>{
+      unsubscribeFromAuth();
+      console.log('did umount');    
+    }     
+  }, [])
+
   return (
-    <div className="App">
-      <div className='heading'>
-        <h4>Incrementer and Decrementer</h4>
-      </div>
-      <div className="input_tag">
-        <input
-          value={inputchange}
-          onChange={changesetting}
-          type="text"
-          placeholder='Add a number ' />
-      </div>
-      <div className="display">
-        {first}
-      </div>
-      <div className="buttons_sec">
-        <button onClick={incrementer}>Increment</button>
-        <button onClick={decrementer}>Decrement</button>
-        <button onClick={reset}>Reset</button>
-      </div>
+    <div>
+      <Header  />           
+      <Routes>
+        <Route exact path='/' element={<HomePage />} />
+        <Route exact path='/shop/*' element={<Shop  />} />         
+        <Route exact path='/checkout' element={<Checkout />} /> 
+        <Route exact path='/signin' element={currentUser ? <Navigate to='/'/> : <SigninAndSignUp/>} />
+      </Routes>
     </div>
   );
 }

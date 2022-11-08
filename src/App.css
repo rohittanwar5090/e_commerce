@@ -1,46 +1,16 @@
-.App{
-  display: flex;
-  flex-direction: column;
-  border: 1px solid lightgray;
-  background-color: #f3f2ef;
-  width: 50%;
-  margin-left: 25%;
-  margin-top: 15%;
-  border-radius: 5px;
-  padding: 10px;
-}
-.heading{
-  display: flex;
-  justify-content: center;
-  color: black;
-  font-size: 12px;
-}
-.input_tag{
-  margin-top: 12px;
-  background-color : #eef3f8;
-  padding: 10px;
-  border-radius: 5px;
-  color: gray;
-}
-.input_tag>input{
-  outline: none;
-  border: none;
-  background: none;   
-}
-.display{
-  display: flex;
-  justify-content: center;
-  padding: 10px;  
-}
-.buttons_sec{
-  display: flex;
-  flex-direction: column;
-}
-.buttons_sec :nth-child(n){
-  display: flex;
-  justify-content: center;
-  margin-left: 25%;
-  margin-right: 25%;
-  border-radius: 5px;
-  margin-bottom: 10px;
-}
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+body {
+
+    font-family: 'Open Sans Condensed';
+    padding: 20px 60px;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  a {
+    text-decoration: none;
+    color: black;
+  }
+  
+  *{
+    box-sizing: border-box;
+  }
